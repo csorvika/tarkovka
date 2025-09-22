@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 
-const Recharts = dynamic(() => import('recharts'), { ssr: false })
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts'
 
 export default function Page() {
