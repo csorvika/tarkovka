@@ -1,22 +1,40 @@
-import { NextResponse } from 'next/server';
-import prisma from '../../../lib/prisma';
+import { NextResponse } from "next/server";
+import { PrismaClient, Prisma } from "@prisma/client";
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const q = searchParams.get('q') || '';
-  const page = Number(searchParams.get('page') || '1');
-  const limit = Number(searchParams.get('limit') || '24');
+const prisma = new PrismaClient();
+
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+
+  const search = searchParams.get("search") || "";
+  const limit = parseInt(searchParams.get("limit") || "10", 10);
+  const page = parseInt(searchParams.get("page") || "1", 10);
+
   const skip = (page - 1) * limit;
 
-  const where = q ? { name: { contains: q, mode: 'insensitive' } } : {};
+  // ✅ Javított where típus
+  const where: Prisma.ItemWhereInput = search
+    ? {
+        name: {
+          contains: search,
+          mode: Prisma.QueryMode.insensitive, // <-- itt volt a gond
+        },
+      }
+    : {};
 
   const items = await prisma.item.findMany({
     where,
     take: limit,
     skip,
-    orderBy: { name: 'asc' },
-    include: { priceHistory: { take: 10, orderBy: { ts: 'desc' } } }
+    orderBy: { name: "asc" },
   });
 
-  return NextResponse.json({ items });
+  const total = await prisma.item.count({ where });
+
+  return NextResponse.json({
+    items,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  });
 }
