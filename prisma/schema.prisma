@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Item {
+  id           String   @id @default(cuid())
+  tarkovId     String   @unique
+  name         String
+  shortName    String?
+  imageUrl     String?
+  avgPrice     Int?
+  lastPrice    Int?
+  lastUpdated  DateTime @default(now())
+  createdAt    DateTime @default(now())
+  priceHistory PriceHistory[]
+  tradable     Boolean  @default(true)
+}
+
+model PriceHistory {
+  id       String   @id @default(cuid())
+  itemId   String
+  item     Item     @relation(fields: [itemId], references: [id])
+  price    Int
+  source   String
+  ts       DateTime @default(now())
+
+  @@index([itemId, ts])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+}
