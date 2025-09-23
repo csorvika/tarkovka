@@ -5,7 +5,12 @@ const nextConfig = {
     appDir: true
   },
   images: {
-    domains: ['res.cloudinary.com', 'assets.tarkov.example']
+    domains: [
+      'res.cloudinary.com',
+      'assets.tarkov.example',
+      'upload.wikimedia.org', // <-- Wikimedia képek
+      'i.imgur.com'           // <-- ha Imgur-t is használnál
+    ]
   }
 }
 
