@@ -2,22 +2,27 @@
 import { useState, useEffect } from "react";
 
 type Item = {
-  id: number;
+  id: string;       // Prisma UUID, ezért string
   name: string;
   price: number;
+  image?: string | null;
 };
 
 export default function ItemsPage() {
   const [items, setItems] = useState<Item[]>([]);
 
   useEffect(() => {
-    // Random dummy itemek generálása
-    const generated: Item[] = Array.from({ length: 12 }, (_, i) => ({
-      id: i + 1,
-      name: `Item ${i + 1}`,
-      price: Math.floor(Math.random() * 100000),
-    }));
-    setItems(generated);
+    async function fetchItems() {
+      try {
+        const res = await fetch("/api/items");
+        const data = await res.json();
+        setItems(data);
+      } catch (error) {
+        console.error("Hiba az itemek betöltésekor:", error);
+      }
+    }
+
+    fetchItems();
   }, []);
 
   return (
@@ -29,6 +34,11 @@ export default function ItemsPage() {
             key={item.id}
             className="bg-gray-800 p-4 rounded-lg shadow hover:shadow-lg transition"
           >
+            <img
+              src={item.image ?? "/placeholder.png"}
+              alt={item.name}
+              className="w-full h-32 object-contain mb-2"
+            />
             <div className="text-lg font-semibold">{item.name}</div>
             <div className="text-green-400 mt-2">{item.price} ₽</div>
           </div>
