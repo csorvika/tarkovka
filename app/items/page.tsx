@@ -18,6 +18,7 @@ export default function ItemsPage() {
         const res = await fetch("/api/items");
         const data = await res.json();
         // itt a gond: az API válasz { items: [...], total, page, ... }
+        console.log("API válasz:", data);
         setItems(data.items); // <-- így kell!
       } catch (error) {
         console.error("Hiba az itemek betöltésekor:", error);
